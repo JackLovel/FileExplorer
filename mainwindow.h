@@ -13,6 +13,8 @@
 #include <QStringList>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QFileDialog>
+#include <QPushButton>
 
 class MainWindow : public QMainWindow
 {
@@ -21,10 +23,18 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void showDirectory(const QString &path);
+
+private slots:
+    void doubleclicked(QListWidgetItem *item);
+    void setDirSlots();
 
 private:
+    QString dir;
     QListWidget *listWidget;
     QWidget *widget;
     QListWidgetItem *item;
+    QPushButton *getDirButton;
+    QString currentPath;
 };
 #endif // MAINWINDOW_H

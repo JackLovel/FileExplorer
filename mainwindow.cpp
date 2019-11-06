@@ -1,12 +1,54 @@
 #include "mainwindow.h"
 
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    getDirButton = new QPushButton("获取目录");
 
     listWidget = new QListWidget();
 
-    QDir dir("E:\\codePro\\FileExplorer");
+    currentPath = "C:\\";
+    showDirectory(currentPath);
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->addWidget(listWidget);
+    layout->addWidget(getDirButton);
+
+    widget = new QWidget();
+    widget->setLayout(layout);
+
+
+    connect(getDirButton, &QPushButton::clicked,this, &MainWindow::setDirSlots);
+    connect(listWidget,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(doubleclicked(QListWidgetItem *)));
+
+    resize(500, 500);
+    setCentralWidget(widget);
+    setWindowTitle("文件浏览器");
+}
+
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::doubleclicked(QListWidgetItem *item)
+{
+
+    QString itemName = item->text();
+    QDir sourceDir(currentPath);
+    //qDebug() << sourceDir.absoluteFilePath(itemName);
+    currentPath = sourceDir.absoluteFilePath(itemName);
+    listWidget->clear();
+    showDirectory(currentPath);
+}
+
+void MainWindow::showDirectory(const QString &path)
+{
+    QDir dir;
+    dir.setPath(path);
+    //qDebug() << dir.currentPath();
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i)
     {
@@ -28,22 +70,16 @@ MainWindow::MainWindow(QWidget *parent)
         item->setIcon(QIcon(iconPath));
         listWidget->insertItem(i, item);
     }
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->addWidget(listWidget);
-
-    widget = new QWidget();
-    widget->setLayout(layout);
-
-    resize(500, 500);
-    setCentralWidget(widget);
-    setWindowTitle("文件浏览器");
 }
 
-MainWindow::~MainWindow()
+void MainWindow::setDirSlots()
 {
+    dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                    "C:\\",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
 
+    currentPath = dir;
+    showDirectory(dir);
 }
-
-
 
